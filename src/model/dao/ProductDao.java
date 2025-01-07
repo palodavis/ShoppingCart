@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface ProductDao {
     void insert(Product obj);
+    void delete(int id);
+
 }

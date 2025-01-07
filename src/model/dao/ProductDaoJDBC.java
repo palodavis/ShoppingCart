@@ -4,10 +4,7 @@ import db.DB;
 import db.DbException;
 import model.Product;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class ProductDaoJDBC implements ProductDao {
 
@@ -26,7 +23,7 @@ public class ProductDaoJDBC implements ProductDao {
 
         String sql = "INSERT INTO product (name, category, price, amount) VALUES (?, ?, ?, ?)";
 
-        try (PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
+        try (PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, obj.getName());
             ps.setString(2, obj.getCategory());
             ps.setDouble(3, obj.getPrice());
@@ -41,12 +38,24 @@ public class ProductDaoJDBC implements ProductDao {
                     obj.setIdProduct(id);
                 }
                 DB.closeResultSet(rs);
-            }
-            else {
+            } else {
                 throw new DbException("No rows affected during insert. Insertion failed.");
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void delete(int id) {
+
+        String sql = ("DELETE FROM product WHERE id_product = ?");
+
+        try (PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
         }
     }
 
