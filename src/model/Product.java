@@ -18,6 +18,8 @@ public class Product implements Serializable {
         this.amount = amount;
     }
 
+    public Product() {}
+
     public Integer getIdProduct() {
         return idProduct;
     }

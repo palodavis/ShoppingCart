@@ -13,5 +13,12 @@ public class Main {
         System.out.println("2 - Test product deletion");
         productDao.delete(3);
         System.out.println("Product Deleted!");
+
+        System.out.println("3 - Test product update");
+        Product product = new Product();
+        product = productDao.searchId(2);
+        product.setName("Laptop");
+        productDao.update(product);
+        System.out.println("Product Updated!");
     }
 }
