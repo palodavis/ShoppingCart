@@ -12,6 +12,7 @@ CREATE TABLE shoppingCart (
     id_shopping INT NOT NULL,
     product_id INT NOT NULL,
     amount INT NOT NULL,
+    total_value DOUBLE NOT NULL,
     PRIMARY KEY (id_cart),
     FOREIGN KEY (product_id) REFERENCES product (id_product)
 );

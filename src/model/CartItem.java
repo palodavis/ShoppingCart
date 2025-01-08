@@ -2,9 +2,9 @@ package model;
 
 public class CartItem {
     private Product product;
-    private Integer amount;
+    private int amount;
 
-    public CartItem(Product product, Integer amount) {
+    public CartItem(Product product, int amount) {
         this.product = product;
         this.amount = amount;
     }
@@ -17,11 +17,11 @@ public class CartItem {
         this.product = product;
     }
 
-    public Integer getAmount() {
+    public int getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(int amount) {
         this.amount = amount;
     }
 

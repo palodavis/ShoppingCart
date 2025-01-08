@@ -34,8 +34,27 @@ public class ShoppingCart {
     }
 
     public void addItem(CartItem item) {
-        this.items.add(item);
+        boolean productFound = false;
+        for (CartItem cartItem : items) {
+            if (cartItem.getProduct().getIdProduct().equals(item.getProduct().getIdProduct())) {
+                cartItem.setAmount(cartItem.getAmount() + item.getAmount());
+                productFound = true;
+                break;
+            }
+        }
+        if (!productFound) {
+            this.items.add(item);
+        }
     }
+
+    public double getTotalValue() {
+        double total = 0;
+        for (CartItem item : items) {
+            total += item.getProduct().getPrice() * item.getAmount();
+        }
+        return total;
+    }
+
 
     @Override
     public String toString() {

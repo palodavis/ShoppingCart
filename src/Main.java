@@ -23,14 +23,20 @@ public class Main {
 //        product.setName("Laptop");
 //        pcontroller.updateProduct(product);
 
-        Product product1 = DaoFactory.createProductDao().searchId(13);
-        Product product2 = DaoFactory.createProductDao().searchId(14);
+        Product product1 = DaoFactory.createProductDao().searchId(1);
+        Product product2 = DaoFactory.createProductDao().searchId(2);
 
-        ShoppingCart cart = new ShoppingCart(4);
+        ShoppingCart cart = new ShoppingCart(1);
 
-        CartItem item1 = new CartItem(product1, 1);
-        CartItem item2 = new CartItem(product2, 1);
+        CartItem item1 = new CartItem(product1, 2);
+        CartItem item2 = new CartItem(product2, 2);
         scontroller.addProductToCart(cart, item1);
         scontroller.addProductToCart(cart, item2);
+
+        for (CartItem cartItem : cart.getItems()) {
+            System.out.println("Product: " + cartItem.getProduct().getName() + ", Quantity: " + cartItem.getAmount());
+        }
+
+        System.out.println("Total value of the shopping cart: " + cart.getTotalValue());
     }
 }

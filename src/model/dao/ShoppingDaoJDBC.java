@@ -23,8 +23,8 @@ public class ShoppingDaoJDBC implements ShoppingDao {
             throw new IllegalArgumentException("ShoppingCart or items cannot be null/empty");
         }
 
-        String insertSql = "INSERT INTO shoppingCart (id_shopping, product_id, amount) VALUES (?, ?, ?)";
-        String checkStockSql = "SELECT amount FROM product WHERE id_product = ?";
+        String insertSql = "INSERT INTO shoppingCart (id_shopping, product_id, amount, total_value) VALUES (?, ?, ?, ?)";
+        String checkStockSql = "SELECT amount, price FROM product WHERE id_product = ?";
         String updateStockSql = "UPDATE product SET amount = amount - ? WHERE id_product = ?";
 
         try (PreparedStatement insertStmt = conn.prepareStatement(insertSql);
@@ -37,13 +37,17 @@ public class ShoppingDaoJDBC implements ShoppingDao {
 
                 if (rs.next()) {
                     int stock = rs.getInt("amount");
+                    double price = rs.getDouble("price");
                     if (item.getAmount() > stock) {
                         throw new DbException("Insufficient stock for product ID: " + item.getProduct().getIdProduct());
                     }
 
+                    double totalValue = item.getAmount() * price;
+
                     insertStmt.setInt(1, cart.getIdShoppingCart());
                     insertStmt.setInt(2, item.getProduct().getIdProduct());
                     insertStmt.setInt(3, item.getAmount());
+                    insertStmt.setDouble(4, totalValue);
                     insertStmt.executeUpdate();
 
                     updateStockStmt.setInt(1, item.getAmount());
