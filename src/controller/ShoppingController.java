@@ -1,5 +1,6 @@
 package controller;
 
+import model.CartItem;
 import model.ShoppingCart;
 import model.dao.ShoppingDao;
 
@@ -10,9 +11,9 @@ public class ShoppingController {
         this.shoppingDao = shoppingDao;
     }
 
-    public void addProductToCart(ShoppingCart cart) {
+    public void addProductToCart(ShoppingCart cart, CartItem item) {
+        cart.addItem(item);
         shoppingDao.addProductCart(cart);
-        System.out.println("Product added to cart successfully!");
-        System.out.println("Shopping Cart ID: " + cart.getIdShoppingCart());
+        System.out.println("Product added to cart successfully: " + item.getProduct().getName());
     }
 }

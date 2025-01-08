@@ -1,19 +1,20 @@
 package model;
 
 import java.io.Serializable;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
-public class ShoppingCart implements Serializable {
+public class ShoppingCart {
     private Integer idShoppingCart;
-    private Integer amount;
-    private Product product;
+    private List<CartItem> items;
 
-    public ShoppingCart() {}
+    public ShoppingCart() {
+        this.items = new ArrayList<>();
+    }
 
-    public ShoppingCart(Integer idShoppingCart, Integer amount, Product product) {
+    public ShoppingCart(Integer idShoppingCart) {
         this.idShoppingCart = idShoppingCart;
-        this.amount = amount;
-        this.product = product;
+        this.items = new ArrayList<>();
     }
 
     public Integer getIdShoppingCart() {
@@ -24,40 +25,23 @@ public class ShoppingCart implements Serializable {
         this.idShoppingCart = idShoppingCart;
     }
 
-    public Integer getAmount() {
-        return amount;
+    public List<CartItem> getItems() {
+        return items;
     }
 
-    public void setAmount(Integer amount) {
-        this.amount = amount;
+    public void setItems(List<CartItem> items) {
+        this.items = items;
     }
 
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        ShoppingCart that = (ShoppingCart) o;
-        return Objects.equals(idShoppingCart, that.idShoppingCart);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(idShoppingCart);
+    public void addItem(CartItem item) {
+        this.items.add(item);
     }
 
     @Override
     public String toString() {
         return "ShoppingCart{" +
                 "idShoppingCart=" + idShoppingCart +
-                ", amount=" + amount +
-                ", product=" + product +
+                ", items=" + items +
                 '}';
     }
 }
