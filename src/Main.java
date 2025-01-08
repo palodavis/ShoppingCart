@@ -1,38 +1,31 @@
+import controller.MainController;
 import model.Product;
 import model.ShoppingCart;
 import model.dao.DaoFactory;
-import model.dao.ProductDao;
-import model.dao.ShoppingDao;
 
 public class Main {
     public static void main(String[] args) {
+        MainController controller = new MainController(
+                DaoFactory.createProductDao(),
+                DaoFactory.createShoppingDao()
+        );
 
-        System.out.println("1 - Test product inserction: ");
-        ProductDao productDao = DaoFactory.createProductDao();
+        System.out.println("1 - Test product insertion:");
         Product newProduct = new Product(null, "Notebook", "Computing", 3500, 2);
-        productDao.insert(newProduct);
-        System.out.println("Inserted! Id = " + newProduct.getIdProduct());
+        controller.addProduct(newProduct);
 
-        System.out.println("2 - Test product deletion: ");
-        productDao.delete(3);
-        System.out.println("Product Deleted!");
+        System.out.println("2 - Test product deletion:");
+        controller.deleteProduct(3);
 
-        System.out.println("3 - Test product update: ");
-        Product product = new Product();
-        product = productDao.searchId(2);
+        System.out.println("3 - Test product update:");
+        Product product = DaoFactory.createProductDao().searchId(2);
         product.setName("Laptop");
-        productDao.update(product);
-        System.out.println("Product Updated!");
+        controller.updateProduct(product);
 
-        System.out.println("4 - Search product by id: ");
-        Product prod = productDao.searchId(2);
-        System.out.println(prod);
+        System.out.println("4 - Search product by ID:");
+        controller.searchId(2);
 
-        //Add product cart
-        ShoppingDao shoppingDao =  DaoFactory.createShoppingDao();
         ShoppingCart cart = new ShoppingCart(null, 1, product);
-        shoppingDao.addProductCart(cart);
-        System.out.println("Product added to cart successfully!");
-        System.out.println("Shopping Cart ID: " + cart.getIdShoppingCart());
+        controller.addProductToCart(cart);
     }
 }
