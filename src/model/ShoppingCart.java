@@ -5,24 +5,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ShoppingCart {
-    private Integer idShoppingCart;
+    private Cart cart;
     private List<CartItem> items;
 
     public ShoppingCart() {
         this.items = new ArrayList<>();
     }
 
-    public ShoppingCart(Integer idShoppingCart) {
-        this.idShoppingCart = idShoppingCart;
+    public ShoppingCart(Cart cart) {
+        this.cart = cart;
         this.items = new ArrayList<>();
     }
 
-    public Integer getIdShoppingCart() {
-        return idShoppingCart;
+    public Cart getCart() {
+        return cart;
     }
 
-    public void setIdShoppingCart(Integer idShoppingCart) {
-        this.idShoppingCart = idShoppingCart;
+    public void setCart(Cart cart) {
+        this.cart = cart;
     }
 
     public List<CartItem> getItems() {
@@ -59,7 +59,7 @@ public class ShoppingCart {
     @Override
     public String toString() {
         return "ShoppingCart{" +
-                "idShoppingCart=" + idShoppingCart +
+                "cart=" + cart +
                 ", items=" + items +
                 '}';
     }

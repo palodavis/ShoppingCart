@@ -41,6 +41,6 @@ public class MainController {
     public void addProductToCart(ShoppingCart cart) {
         shoppingDao.addProductCart(cart);
         System.out.println("Product added to cart successfully!");
-        System.out.println("Shopping Cart ID: " + cart.getIdShoppingCart());
+        System.out.println("Shopping Cart ID: " + cart.getCart());
     }
 }

@@ -2,13 +2,11 @@ package model.dao;
 
 import db.DB;
 import db.DbException;
+import model.Cart;
 import model.CartItem;
 import model.ShoppingCart;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class ShoppingDaoJDBC implements ShoppingDao {
     private Connection conn;
@@ -23,8 +21,7 @@ public class ShoppingDaoJDBC implements ShoppingDao {
             throw new IllegalArgumentException("ShoppingCart or items cannot be null/empty");
         }
 
-        String insertSql = "INSERT INTO shoppingCart (id_shopping, product_id, amount, total_value) VALUES (?, ?, ?, ?)";
-        String checkStockSql = "SELECT amount, price FROM product WHERE id_product = ?";
+        String insertSql = "INSERT INTO shoppingCart (cart_id, product_id, amount, total_value) VALUES (?, ?, ?, ?)";        String checkStockSql = "SELECT amount, price FROM product WHERE id_product = ?";
         String updateStockSql = "UPDATE product SET amount = amount - ? WHERE id_product = ?";
 
         try (PreparedStatement insertStmt = conn.prepareStatement(insertSql);
@@ -44,7 +41,7 @@ public class ShoppingDaoJDBC implements ShoppingDao {
 
                     double totalValue = item.getAmount() * price;
 
-                    insertStmt.setInt(1, cart.getIdShoppingCart());
+                    insertStmt.setInt(1, cart.getCart().getIdCart());
                     insertStmt.setInt(2, item.getProduct().getIdProduct());
                     insertStmt.setInt(3, item.getAmount());
                     insertStmt.setDouble(4, totalValue);

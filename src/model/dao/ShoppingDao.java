@@ -1,6 +1,5 @@
 package model.dao;
 
-
 import model.ShoppingCart;
 
 public interface ShoppingDao {

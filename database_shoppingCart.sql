@@ -7,12 +7,19 @@ CREATE TABLE product
     amount INT NOT NULL
 );
 
-CREATE TABLE shoppingCart (
-    id_cart INT NOT NULL AUTO_INCREMENT,
-    id_shopping INT NOT NULL,
+
+CREATE TABLE shoppingCart
+(
+    id_shoppingCart INT PRIMARY KEY AUTO_INCREMENT,
+    cart_id INT NOT NULL,
     product_id INT NOT NULL,
     amount INT NOT NULL,
     total_value DOUBLE NOT NULL,
-    PRIMARY KEY (id_cart),
+    FOREIGN KEY (cart_id) REFERENCES cart (id_cart),
     FOREIGN KEY (product_id) REFERENCES product (id_product)
+);
+
+CREATE TABLE cart
+(
+    id_cart INT PRIMARY KEY AUTO_INCREMENT
 );
