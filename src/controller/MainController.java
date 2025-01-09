@@ -1,7 +1,7 @@
 package controller;
 
-import model.Product;
-import model.ShoppingCart;
+import model.entities.Product;
+import model.entities.ShoppingCart;
 import model.dao.ProductDao;
 import model.dao.ShoppingDao;
 

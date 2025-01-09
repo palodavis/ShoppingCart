@@ -1,7 +1,8 @@
-package model.dao;
+package model.dao.impl;
 
 import db.DbException;
-import model.Cart;
+import model.dao.CartDao;
+import model.entities.Cart;
 
 import java.sql.*;
 

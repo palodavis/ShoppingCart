@@ -1,6 +1,6 @@
 package model.dao;
 
-import model.Product;
+import model.entities.Product;
 
 public interface ProductDao {
     void insert(Product obj);

@@ -1,8 +1,9 @@
-package model.dao;
+package model.dao.impl;
 
 import db.DB;
 import db.DbException;
-import model.Product;
+import model.dao.ProductDao;
+import model.entities.Product;
 
 import java.sql.*;
 

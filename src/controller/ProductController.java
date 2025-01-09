@@ -1,6 +1,6 @@
 package controller;
 
-import model.Product;
+import model.entities.Product;
 import model.dao.ProductDao;
 
 public class ProductController {

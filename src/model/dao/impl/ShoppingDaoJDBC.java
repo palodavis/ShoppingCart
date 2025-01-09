@@ -1,10 +1,10 @@
-package model.dao;
+package model.dao.impl;
 
 import db.DB;
 import db.DbException;
-import model.Cart;
-import model.CartItem;
-import model.ShoppingCart;
+import model.dao.ShoppingDao;
+import model.entities.CartItem;
+import model.entities.ShoppingCart;
 
 import java.sql.*;
 
@@ -21,7 +21,8 @@ public class ShoppingDaoJDBC implements ShoppingDao {
             throw new IllegalArgumentException("ShoppingCart or items cannot be null/empty");
         }
 
-        String insertSql = "INSERT INTO shoppingCart (cart_id, product_id, amount, total_value) VALUES (?, ?, ?, ?)";        String checkStockSql = "SELECT amount, price FROM product WHERE id_product = ?";
+        String insertSql = "INSERT INTO shoppingCart (cart_id, product_id, amount, total_value) VALUES (?, ?, ?, ?)";
+        String checkStockSql = "SELECT amount, price FROM product WHERE id_product = ?";
         String updateStockSql = "UPDATE product SET amount = amount - ? WHERE id_product = ?";
 
         try (PreparedStatement insertStmt = conn.prepareStatement(insertSql);
