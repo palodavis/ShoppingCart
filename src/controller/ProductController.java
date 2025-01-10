@@ -25,13 +25,14 @@ public class ProductController {
         System.out.println("Product Updated!");
     }
 
-    public void searchId(int productId) {
+    public Product searchId(int productId) {
         Product product = productDao.searchId(productId);
         if (product != null) {
             System.out.println("Product Details: " + product);
         } else {
             System.out.println("Product not found!");
         }
+        return product;
     }
 
 }

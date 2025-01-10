@@ -25,11 +25,12 @@ public class ShoppingDaoJDBC implements ShoppingDao {
         String checkStockSql = "SELECT amount, price FROM product WHERE id_product = ?";
         String updateStockSql = "UPDATE product SET amount = amount - ? WHERE id_product = ?";
 
-        try (PreparedStatement insertStmt = conn.prepareStatement(insertSql);
+        try (PreparedStatement insertStmt = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
              PreparedStatement checkStockStmt = conn.prepareStatement(checkStockSql);
              PreparedStatement updateStockStmt = conn.prepareStatement(updateStockSql)) {
 
             for (CartItem item : cart.getItems()) {
+                //System.out.println("Processing product ID: " + item.getProduct().getIdProduct());
                 checkStockStmt.setInt(1, item.getProduct().getIdProduct());
                 ResultSet rs = checkStockStmt.executeQuery();
 
@@ -46,11 +47,20 @@ public class ShoppingDaoJDBC implements ShoppingDao {
                     insertStmt.setInt(2, item.getProduct().getIdProduct());
                     insertStmt.setInt(3, item.getAmount());
                     insertStmt.setDouble(4, totalValue);
-                    insertStmt.executeUpdate();
 
                     updateStockStmt.setInt(1, item.getAmount());
                     updateStockStmt.setInt(2, item.getProduct().getIdProduct());
                     updateStockStmt.executeUpdate();
+
+                    int rowsAffected = insertStmt.executeUpdate();
+                    if (rowsAffected > 0) {
+                        ResultSet generatedKeys = insertStmt.getGeneratedKeys();
+                        if (generatedKeys.next()) {
+                            int id = generatedKeys.getInt(1);
+                            item.getProduct().setIdProduct(id);
+                        }
+                        DB.closeResultSet(generatedKeys);
+                    }
                 }
                 DB.closeResultSet(rs);
             }
@@ -59,8 +69,9 @@ public class ShoppingDaoJDBC implements ShoppingDao {
         }
     }
 
+
     @Override
-    public void updateProductCart(ShoppingCart cart) {
+    public void updateProductCart(ShoppingCart cart) throws DbException {
         if (cart == null || cart.getItems().isEmpty()) {
             throw new IllegalArgumentException("Shopping Cart or items cannot be null/empty");
         }
@@ -121,5 +132,10 @@ public class ShoppingDaoJDBC implements ShoppingDao {
         } catch (SQLException e) {
             throw new DbException("Error updating product in the shopping cart: " + e.getMessage());
         }
+    }
+
+    @Override
+    public void deleteProductCart(ShoppingCart cart) {
+
     }
 }

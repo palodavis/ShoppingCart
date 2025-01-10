@@ -12,6 +12,6 @@ public class CartController {
 
     public void addCart(Cart cart) {
         cartDao.insertCart(cart);
-        System.out.println("Inserted! Id = " + cart.getIdCart());
+        System.out.println("Inserted! IdCart = " + cart.getIdCart());
     }
 }
