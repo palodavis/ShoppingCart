@@ -12,12 +12,17 @@ public class ProductController {
 
     public void addProduct(Product product) {
         productDao.insert(product);
-        System.out.println("Inserted! Id = " + product.getIdProduct());
+        System.out.println("Product inserted! Id = " + product.getIdProduct());
     }
 
     public void deleteProduct(int productId) {
-        productDao.delete(productId);
-        System.out.println("Product Deleted!");
+        Product product = productDao.searchId(productId);
+        if (product != null) {
+            productDao.delete(productId);
+            System.out.println("Product Deleted! Id = " + productId);
+        } else {
+            System.out.println("Product not found! Unable to delete.");
+        }
     }
 
     public void updateProduct(Product product) {

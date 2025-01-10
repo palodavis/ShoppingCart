@@ -97,7 +97,7 @@ public class ShoppingDaoJDBC implements ShoppingDao {
                 if (currentRs.next()) {
                     currentAmount = currentRs.getInt("amount");
                 } else {
-                    throw new DbException("Product not found in the cart: ID " + productId);
+                    System.err.println("Product not found in the cart: ID " + productId);
                 }
                 DB.closeResultSet(currentRs);
 
@@ -108,15 +108,16 @@ public class ShoppingDaoJDBC implements ShoppingDao {
                 if (stockRs.next()) {
                     stock = stockRs.getInt("amount");
                 } else {
-                    throw new DbException("Product not found: ID " + productId);
+                    System.err.println("Product not found: ID " + productId);
                 }
                 DB.closeResultSet(stockRs);
 
                 int stockChange = currentAmount - newAmount;
 
                 if (stock + stockChange < 0) {
-                    throw new DbException("Insufficient stock for product ID: " + productId);
+                    System.err.println("Insufficient stock for product ID: " + productId);
                 }
+
                 double totalValue = newAmount * item.getProduct().getPrice();
                 updateCartStmt.setInt(1, newAmount);
                 updateCartStmt.setDouble(2, totalValue);

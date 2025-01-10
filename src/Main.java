@@ -49,20 +49,15 @@ public class Main {
             System.out.println("Product: " + cartItem.getProduct().getName() + ", Quantity: " + cartItem.getAmount());
         }
 
-        scontroller.deleteProductFromCart(shoppingCart, 2);
+        //scontroller.deleteProductFromCart(shoppingCart, 2);
 
         System.out.println("Cart after deletion:");
         for (CartItem cartItem : shoppingCart.getItems()) {
             System.out.println("Product: " + cartItem.getProduct().getName() + ", Quantity: " + cartItem.getAmount());
         }
 
-//        item2.setAmount(1);
-//        scontroller.updateProductToCart(shoppingCart);
-
-
-//        for (CartItem cartItem : shoppingCart.getItems()) {
-//            System.out.println("Product: " + cartItem.getProduct().getName() + ", Quantity: " + cartItem.getAmount());
-//        }
+        //item2.setAmount(1);
+        //scontroller.updateProductToCart(shoppingCart);
 
         System.out.println("Total value of the shopping cart: " + shoppingCart.getTotalValue());
     }
