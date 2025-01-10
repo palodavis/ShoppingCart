@@ -18,8 +18,9 @@ public class ShoppingController {
         System.out.println("Product added to cart successfully: " + item.getProduct().getName());
     }
 
-    public void updateProductToCart(ShoppingCart shoppingCart) {
-        shoppingDao.updateProductCart(shoppingCart);
-        System.out.println("Product Updated!");
+    public void deleteProductFromCart(ShoppingCart cart, Integer productId) {
+        shoppingDao.deleteProductCart(cart.getCart().getIdCart(), productId);
+        cart.updateTotalValue();
+        System.out.println("Product removed from cart successfully: Product ID " + productId);
     }
 }

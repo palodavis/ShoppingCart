@@ -69,7 +69,6 @@ public class ShoppingDaoJDBC implements ShoppingDao {
         }
     }
 
-
     @Override
     public void updateProductCart(ShoppingCart cart) throws DbException {
         if (cart == null || cart.getItems().isEmpty()) {
@@ -135,7 +134,39 @@ public class ShoppingDaoJDBC implements ShoppingDao {
     }
 
     @Override
-    public void deleteProductCart(ShoppingCart cart) {
+    public void deleteProductCart(int cartId, int productId) {
+        String deleteCartSql = "DELETE FROM shoppingCart WHERE cart_id = ? AND product_id = ?";
+        String updateStockSql = "UPDATE product SET amount = amount + ? WHERE id_product = ?";
+        String selectCartSql = "SELECT amount FROM shoppingCart WHERE cart_id = ? AND product_id = ?";
 
+        try (PreparedStatement selectCartStmt = conn.prepareStatement(selectCartSql);
+             PreparedStatement deleteCartStmt = conn.prepareStatement(deleteCartSql);
+             PreparedStatement updateStockStmt = conn.prepareStatement(updateStockSql)) {
+
+            selectCartStmt.setInt(1, cartId);
+            selectCartStmt.setInt(2, productId);
+            ResultSet rs = selectCartStmt.executeQuery();
+
+            if (rs.next()) {
+                int amountInCart = rs.getInt("amount");
+
+                deleteCartStmt.setInt(1, cartId);
+                deleteCartStmt.setInt(2, productId);
+                int rowsAffected = deleteCartStmt.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    updateStockStmt.setInt(1, amountInCart);
+                    updateStockStmt.setInt(2, productId);
+                    updateStockStmt.executeUpdate();
+                } else {
+                    throw new DbException("Error deleting product from cart: product not found.");
+                }
+            } else {
+                throw new DbException("Product not found in cart.");
+            }
+            DB.closeResultSet(rs);
+        } catch (SQLException e) {
+            throw new DbException("Error deleting product from cart: " + e.getMessage());
+        }
     }
 }

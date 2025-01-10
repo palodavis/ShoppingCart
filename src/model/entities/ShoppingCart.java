@@ -6,6 +6,7 @@ import java.util.List;
 public class ShoppingCart {
     private Cart cart;
     private List<CartItem> items;
+    private double totalValue;
 
     public ShoppingCart() {
         this.items = new ArrayList<>();
@@ -44,14 +45,23 @@ public class ShoppingCart {
         if (!productFound) {
             this.items.add(item);
         }
+        updateTotalValue();
     }
 
+
     public double getTotalValue() {
+        return items.stream()
+                .mapToDouble(item -> item.getAmount() * item.getProduct().getPrice())
+                .sum();
+    }
+
+
+    public void updateTotalValue() {
         double total = 0;
         for (CartItem item : items) {
-            total += item.getProduct().getPrice() * item.getAmount();
+            total += item.getAmount() * item.getProduct().getPrice();
         }
-        return total;
+        this.totalValue = total;
     }
 
 
