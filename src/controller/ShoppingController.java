@@ -1,6 +1,7 @@
 package controller;
 
 import model.entities.CartItem;
+import model.entities.Product;
 import model.entities.ShoppingCart;
 import model.dao.ShoppingDao;
 
@@ -23,9 +24,23 @@ public class ShoppingController {
     }
 
     public boolean deleteProductFromCart(ShoppingCart cart, Integer productId) {
+        if (cart == null || productId == null) {
+            System.out.println("Invalid cart or product ID.");
+            return false;
+        }
+
         shoppingDao.deleteProductCart(cart.getCart().getIdCart(), productId);
         cart.updateTotalValue();
         System.out.println("Product removed from cart successfully: Product ID " + productId);
-        return false;
+        return true;
+    }
+
+
+    public ShoppingCart searchIdProuctCard(int productId) {
+        ShoppingCart shoppingCart = shoppingDao.listProductsInCart(productId);
+        if (shoppingCart != null) {
+            System.out.println("Product Details: " + shoppingCart);
+        }
+        return shoppingCart;
     }
 }

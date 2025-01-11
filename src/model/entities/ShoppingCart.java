@@ -10,6 +10,7 @@ public class ShoppingCart {
 
     public ShoppingCart() {
         this.items = new ArrayList<>();
+        this.cart = new Cart();
     }
 
     public ShoppingCart(Cart cart) {
@@ -50,9 +51,13 @@ public class ShoppingCart {
 
 
     public double getTotalValue() {
-        return items.stream()
-                .mapToDouble(item -> item.getAmount() * item.getProduct().getPrice())
-                .sum();
+        double total = 0.0;
+
+        for (CartItem item : items) {
+            total += item.getProduct().getPrice() * item.getAmount();
+        }
+
+        return total;
     }
 
 
