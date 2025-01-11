@@ -78,34 +78,23 @@ public class ShoppingApp {
                         productToUpdate.setAmount(newAmount);
 
                         pcontroller.updateProduct(productToUpdate);
-                    } else {
-                        System.out.println("Product not found!");
                     }
+
                     break;
 
                 case 3:
                     System.out.print("Enter the ID of the product to delete: ");
                     int productIdToDelete = scanner.nextInt();
                     scanner.nextLine();
-                    Product productToDelete = pcontroller.searchId(productIdToDelete);
-                    if (productToDelete != null) {
-                        pcontroller.deleteProduct(productIdToDelete);
-                        System.out.println("Product deleted successfully.");
-                    } else {
-                        System.out.println("Product not found!");
-                    }
+                    pcontroller.searchId(productIdToDelete);
+                    pcontroller.deleteProduct(productIdToDelete);
                     break;
 
                 case 4:
                     System.out.print("Enter the ID of the product to view: ");
                     int productIdToView = scanner.nextInt();
                     scanner.nextLine();
-                    Product productToView = pcontroller.searchId(productIdToView);
-                    if (productToView != null) {
-                        System.out.println(productToView);
-                    } else {
-                        System.out.println("Product not found!");
-                    }
+                    pcontroller.searchId(productIdToView);
                     break;
 
                 case 5:
@@ -120,6 +109,9 @@ public class ShoppingApp {
                         scanner.nextLine();
                         Product productToAdd = pcontroller.searchId(productIdToAdd);
 
+                        boolean productExistsInCart = shoppingCart.getItems().stream()
+                                .anyMatch(item -> item.getProduct().getIdProduct() == productIdToAdd);
+
                         if (productToAdd != null) {
                             System.out.print("Enter the quantity to add: ");
                             int quantity = scanner.nextInt();
@@ -127,9 +119,6 @@ public class ShoppingApp {
 
                             CartItem cartItem = new CartItem(productToAdd, quantity);
                             scontroller.addProductToCart(shoppingCart, cartItem);
-                            System.out.println("Product added to cart successfully!");
-                        } else {
-                            System.out.println("Product not found!");
                         }
 
                         System.out.print("Do you want to add another product? (yes/no): ");
@@ -172,15 +161,11 @@ public class ShoppingApp {
                     }
                     break;
 
-
                 case 8:
-                    ShoppingCart shoppingCartView = new ShoppingCart();
-
-                    System.out.println("Cart details:");
-                    for (CartItem cartItem : shoppingCartView.getItems()) {
-                        System.out.println("Product: " + cartItem.getProduct().getName() + ", Quantity: " + cartItem.getAmount());
-                    }
-                    System.out.println("Total value of the shopping cart: " + shoppingCartView.getTotalValue());
+                    System.out.print("Enter the Cart ID to view: ");
+                    int cartIdToView = scanner.nextInt();
+                    scanner.nextLine();
+                    scontroller.searchIdProuctCard(cartIdToView);
                     break;
 
                 case 9:

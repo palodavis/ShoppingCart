@@ -7,6 +7,7 @@ import model.entities.CartItem;
 import model.entities.ShoppingCart;
 
 import java.sql.*;
+import java.util.Scanner;
 
 public class ShoppingDaoJDBC implements ShoppingDao {
     private Connection conn;
@@ -21,22 +22,46 @@ public class ShoppingDaoJDBC implements ShoppingDao {
             throw new IllegalArgumentException("Shopping Cart or items cannot be null/empty");
         }
 
+        String checkCartSql = "SELECT product_id FROM shoppingCart WHERE cart_id = ? AND product_id = ?";
         String insertSql = "INSERT INTO shoppingCart (cart_id, product_id, amount, total_value) VALUES (?, ?, ?, ?)";
         String checkStockSql = "SELECT amount, price FROM product WHERE id_product = ?";
         String updateStockSql = "UPDATE product SET amount = amount - ? WHERE id_product = ?";
 
-        try (PreparedStatement insertStmt = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
+        try (PreparedStatement checkCartStmt = conn.prepareStatement(checkCartSql);
+             PreparedStatement insertStmt = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
              PreparedStatement checkStockStmt = conn.prepareStatement(checkStockSql);
              PreparedStatement updateStockStmt = conn.prepareStatement(updateStockSql)) {
 
             for (CartItem item : cart.getItems()) {
                 //System.out.println("Processing product ID: " + item.getProduct().getIdProduct());
+
+                checkCartStmt.setInt(1, cart.getCart().getIdCart());
+                checkCartStmt.setInt(2, item.getProduct().getIdProduct());
+                ResultSet rsCartCheck = checkCartStmt.executeQuery();
+
+                //check product id in the cart
+                if (rsCartCheck.next()) {
+                    System.out.println("Product with ID " + item.getProduct().getIdProduct() + " is already in the cart.");
+                    continue;
+                }
+
                 checkStockStmt.setInt(1, item.getProduct().getIdProduct());
                 ResultSet rs = checkStockStmt.executeQuery();
 
+                //check stock in the cart
                 if (rs.next()) {
                     int stock = rs.getInt("amount");
                     double price = rs.getDouble("price");
+
+                    while (item.getAmount() <= 0) {
+                        Scanner sc = new Scanner(System.in);
+                        System.out.println("Invalid quantity for product ID " + item.getProduct().getIdProduct() +
+                                ". Please enter a valid quantity (1 or more): ");
+                        item.setAmount(sc.nextInt());
+                        sc.nextLine();
+                    }
+
+
                     if (item.getAmount() > stock) {
                         throw new DbException("Insufficient stock for product ID: " + item.getProduct().getIdProduct());
                     }
@@ -61,6 +86,7 @@ public class ShoppingDaoJDBC implements ShoppingDao {
                         }
                         DB.closeResultSet(generatedKeys);
                     }
+                    System.out.println("Product added to cart successfully: " + item.getProduct().getName());
                 }
                 DB.closeResultSet(rs);
             }
@@ -151,7 +177,6 @@ public class ShoppingDaoJDBC implements ShoppingDao {
             throw new DbException("Error deleting product from cart: " + e.getMessage());
         }
     }
-
 
     @Override
     public ShoppingCart listProductsInCart(int cartId) {

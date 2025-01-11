@@ -1,5 +1,6 @@
 package controller;
 
+import db.DbException;
 import model.entities.CartItem;
 import model.entities.Product;
 import model.entities.ShoppingCart;
@@ -14,8 +15,11 @@ public class ShoppingController {
 
     public void addProductToCart(ShoppingCart cart, CartItem item) {
         cart.addItem(item);
-        shoppingDao.addProductCart(cart);
-        System.out.println("Product added to cart successfully: " + item.getProduct().getName());
+        try {
+            shoppingDao.addProductCart(cart);
+        } catch (DbException e) {
+            System.err.println("Failed to add product to cart: " + e.getMessage());
+        }
     }
 
     public void updateProductToCart(ShoppingCart shoppingCart) {
@@ -28,7 +32,6 @@ public class ShoppingController {
             System.out.println("Invalid cart or product ID.");
             return false;
         }
-
         shoppingDao.deleteProductCart(cart.getCart().getIdCart(), productId);
         cart.updateTotalValue();
         System.out.println("Product removed from cart successfully: Product ID " + productId);
@@ -39,8 +42,9 @@ public class ShoppingController {
     public ShoppingCart searchIdProuctCard(int productId) {
         ShoppingCart shoppingCart = shoppingDao.listProductsInCart(productId);
         if (shoppingCart != null) {
-            System.out.println("Product Details: " + shoppingCart);
+            System.out.println("Product in the cart Details: " + shoppingCart);
         }
+
         return shoppingCart;
     }
 }
