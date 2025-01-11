@@ -22,9 +22,9 @@ public class ShoppingController {
         }
     }
 
-    public void updateProductToCart(ShoppingCart shoppingCart) {
-        shoppingDao.updateProductCart(shoppingCart);
-        System.out.println("Product Updated!");
+    public void updateProductToCart(ShoppingCart shoppingCart, int productId) {
+        shoppingDao.updateProductCart(shoppingCart, productId);
+        System.out.println("Product in cart Updated!");
     }
 
     public boolean deleteProductFromCart(ShoppingCart cart, Integer productId) {
@@ -38,13 +38,16 @@ public class ShoppingController {
         return true;
     }
 
-
     public ShoppingCart searchIdProuctCard(int productId) {
         ShoppingCart shoppingCart = shoppingDao.listProductsInCart(productId);
         if (shoppingCart != null) {
             System.out.println("Product in the cart Details: " + shoppingCart);
         }
+        return shoppingCart;
+    }
 
+    public ShoppingCart totalValueCart(int cartId) {
+        ShoppingCart shoppingCart = shoppingDao.totalValueCart(cartId);
         return shoppingCart;
     }
 }

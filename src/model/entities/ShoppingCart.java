@@ -60,6 +60,8 @@ public class ShoppingCart {
         return total;
     }
 
+    public void setTotalValue(double totalValue) {
+    }
 
     public void updateTotalValue() {
         double total = 0;
@@ -77,4 +79,5 @@ public class ShoppingCart {
                 ", items=" + items +
                 '}';
     }
+
 }

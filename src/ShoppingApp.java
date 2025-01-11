@@ -1,6 +1,7 @@
 import controller.CartController;
 import controller.ProductController;
 import controller.ShoppingController;
+import db.DbException;
 import model.dao.DaoFactory;
 import model.entities.Product;
 import model.entities.Cart;
@@ -21,7 +22,7 @@ public class ShoppingApp {
 
         do {
             System.out.println("Choose an option:");
-            System.out.println("-------Product ---------------");
+            System.out.println("-------Product Stock---------");
             System.out.println("| 1 - Insert new product     |");
             System.out.println("| 2 - Update product         |");
             System.out.println("| 3 - Delete product         |");
@@ -136,7 +137,35 @@ public class ShoppingApp {
                     break;
 
                 case 6:
+                    System.out.print("Enter the Cart ID: ");
+                    int idCart = scanner.nextInt();
+                    scanner.nextLine();
 
+                    System.out.print("Enter the Product ID to update: ");
+                    int productIdUpdate = scanner.nextInt();
+                    scanner.nextLine();
+
+                    System.out.print("Enter the new quantity: ");
+                    int newQuantity = scanner.nextInt();
+                    scanner.nextLine();
+
+                    Product productCartToUpdate = pcontroller.searchId(productIdUpdate);
+
+                    if (productCartToUpdate != null) {
+                        ShoppingCart shoppingCartToUpdate = new ShoppingCart();
+                        shoppingCartToUpdate.getCart().setIdCart(idCart);
+
+                        CartItem itemToUpdate = new CartItem(productCartToUpdate, newQuantity);
+                        shoppingCartToUpdate.addItem(itemToUpdate);
+
+                        try {
+                            scontroller.updateProductToCart(shoppingCartToUpdate, productIdUpdate);
+                        } catch (DbException e) {
+                            System.out.println("Error: " + e.getMessage());
+                        }
+                    } else {
+                        System.out.println("Product not found.");
+                    }
                     break;
 
 
@@ -166,6 +195,8 @@ public class ShoppingApp {
                     int cartIdToView = scanner.nextInt();
                     scanner.nextLine();
                     scontroller.searchIdProuctCard(cartIdToView);
+                    System.out.println("\nCart details:");
+                    scontroller.totalValueCart(cartIdToView);
                     break;
 
                 case 9:

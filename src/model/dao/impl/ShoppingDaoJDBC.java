@@ -96,9 +96,9 @@ public class ShoppingDaoJDBC implements ShoppingDao {
     }
 
     @Override
-    public void updateProductCart(ShoppingCart cart) throws DbException {
-        if (cart == null || cart.getItems().isEmpty()) {
-            throw new IllegalArgumentException("Shopping Cart or items cannot be null/empty");
+    public void updateProductCart(ShoppingCart cart, int productId) throws DbException {
+        if (cart == null || cart.getCart() == null || cart.getCart().getIdCart() <= 0) {
+            throw new IllegalArgumentException("Shopping Cart or cart ID cannot be null/invalid");
         }
 
         String selectCurrentSql = "SELECT amount FROM shoppingCart WHERE cart_id = ? AND product_id = ?";
@@ -111,51 +111,51 @@ public class ShoppingDaoJDBC implements ShoppingDao {
              PreparedStatement updateCartStmt = conn.prepareStatement(updateCartSql);
              PreparedStatement updateStockStmt = conn.prepareStatement(updateStockSql)) {
 
-            for (CartItem item : cart.getItems()) {
-                int productId = item.getProduct().getIdProduct();
-                int newAmount = item.getAmount();
+            int cartId = cart.getCart().getIdCart();
+            CartItem item = cart.getItems().get(0);
+            int newAmount = item.getAmount();
 
-                selectCurrentStmt.setInt(1, cart.getCart().getIdCart());
-                selectCurrentStmt.setInt(2, productId);
-                ResultSet currentRs = selectCurrentStmt.executeQuery();
+            selectCurrentStmt.setInt(1, cartId);
+            selectCurrentStmt.setInt(2, productId);
+            ResultSet currentRs = selectCurrentStmt.executeQuery();
 
-                int currentAmount = 0;
-                if (currentRs.next()) {
-                    currentAmount = currentRs.getInt("amount");
-                } else {
-                    throw new DbException("Product not found in the cart for ID: " + productId);
-                }
-                DB.closeResultSet(currentRs);
-
-                checkStockStmt.setInt(1, productId);
-                ResultSet stockRs = checkStockStmt.executeQuery();
-
-                int stock = 0;
-                if (stockRs.next()) {
-                    stock = stockRs.getInt("amount");
-                } else {
-                    throw new DbException("Product not found in stock for ID: " + productId);
-                }
-                DB.closeResultSet(stockRs);
-
-                int stockChange = currentAmount - newAmount;
-
-                if (stock + stockChange < 0) {
-                    throw new DbException("Insufficient stock for product ID: " + productId);
-                }
-
-                double totalValue = newAmount * item.getProduct().getPrice();
-
-                updateCartStmt.setInt(1, newAmount);
-                updateCartStmt.setDouble(2, totalValue);
-                updateCartStmt.setInt(3, cart.getCart().getIdCart());
-                updateCartStmt.setInt(4, productId);
-                updateCartStmt.executeUpdate();
-
-                updateStockStmt.setInt(1, stockChange);
-                updateStockStmt.setInt(2, productId);
-                updateStockStmt.executeUpdate();
+            int currentAmount = 0;
+            if (currentRs.next()) {
+                currentAmount = currentRs.getInt("amount");
+            } else {
+                throw new DbException("Product not found in the cart for ID: " + productId);
             }
+            DB.closeResultSet(currentRs);
+
+            checkStockStmt.setInt(1, productId);
+            ResultSet stockRs = checkStockStmt.executeQuery();
+
+            int stock = 0;
+            if (stockRs.next()) {
+                stock = stockRs.getInt("amount");
+            } else {
+                throw new DbException("Product not found in stock for ID: " + productId);
+            }
+            DB.closeResultSet(stockRs);
+
+            int stockChange = currentAmount - newAmount;
+
+            if (stock + stockChange < 0) {
+                throw new DbException("Insufficient stock for product ID: " + productId);
+            }
+
+            double totalValue = newAmount * item.getProduct().getPrice();
+
+            updateCartStmt.setInt(1, newAmount);
+            updateCartStmt.setDouble(2, totalValue);
+            updateCartStmt.setInt(3, cartId);
+            updateCartStmt.setInt(4, productId);
+            updateCartStmt.executeUpdate();
+
+            updateStockStmt.setInt(1, stockChange);
+            updateStockStmt.setInt(2, productId);
+            updateStockStmt.executeUpdate();
+
         } catch (SQLException e) {
             throw new DbException("Error updating product in the shopping cart: " + e.getMessage());
         }
@@ -206,4 +206,32 @@ public class ShoppingDaoJDBC implements ShoppingDao {
         return null;
     }
 
+    @Override
+    public ShoppingCart totalValueCart(int cartId) {
+        String sql = "SELECT sc.cart_id AS cart_id, " +
+                "       SUM(sc.total_value) AS total_cart_value " +
+                "FROM shoppingCart sc " +
+                "WHERE sc.cart_id = ? " +
+                "GROUP BY sc.cart_id";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, cartId);
+            ResultSet rs = stmt.executeQuery();
+
+            ShoppingCart shoppingCart = new ShoppingCart();
+            shoppingCart.getCart().setIdCart(cartId);
+            if (rs.next()) {
+                double totalValue = rs.getDouble("total_cart_value");
+                shoppingCart.setTotalValue(totalValue);
+                System.out.println("Total Value of Cart ID " + cartId + ": " + totalValue);
+            } else {
+                System.out.println("Cart ID " + cartId + " is empty or does not exist.");
+            }
+
+            DB.closeResultSet(rs);
+            return shoppingCart;
+        } catch (SQLException e) {
+            throw new DbException("Error calculating total value of cart: " + e.getMessage());
+        }
+    }
 }
