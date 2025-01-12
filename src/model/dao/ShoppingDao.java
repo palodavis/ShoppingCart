@@ -1,6 +1,5 @@
 package model.dao;
 
-import db.DbException;
 import model.entities.ShoppingCart;
 
 public interface ShoppingDao {

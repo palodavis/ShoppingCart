@@ -2,7 +2,6 @@ package controller;
 
 import db.DbException;
 import model.entities.CartItem;
-import model.entities.Product;
 import model.entities.ShoppingCart;
 import model.dao.ShoppingDao;
 
