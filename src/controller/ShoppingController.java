@@ -33,7 +33,6 @@ public class ShoppingController {
         }
         shoppingDao.deleteProductCart(cart.getCart().getIdCart(), productId);
         cart.updateTotalValue();
-        System.out.println("Product removed from cart successfully: Product ID " + productId);
         return true;
     }
 

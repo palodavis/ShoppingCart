@@ -86,7 +86,7 @@ public class ShoppingDaoJDBC implements ShoppingDao {
                         }
                         DB.closeResultSet(generatedKeys);
                     }
-                    System.out.println("Product added to cart successfully: " + item.getProduct().getName());
+                    //System.out.println("Product added to cart successfully: " + item.getProduct().getName());
                 }
                 DB.closeResultSet(rs);
             }
@@ -164,17 +164,42 @@ public class ShoppingDaoJDBC implements ShoppingDao {
     @Override
     public void deleteProductCart(int cartId, int productId) throws DbException {
         String deleteSql = "DELETE FROM shoppingCart WHERE cart_id = ? AND product_id = ?";
+        String selectAmountSql = "SELECT amount FROM shoppingCart WHERE cart_id = ? AND product_id = ?";
+        String updateStockSql = "UPDATE product SET amount = amount + ? WHERE id_product = ?";
 
-        try (PreparedStatement stmt = conn.prepareStatement(deleteSql)) {
-            stmt.setInt(1, cartId);
-            stmt.setInt(2, productId);
+        try (PreparedStatement selectAmountStmt = conn.prepareStatement(selectAmountSql);
+             PreparedStatement deleteStmt = conn.prepareStatement(deleteSql);
+             PreparedStatement updateStockStmt = conn.prepareStatement(updateStockSql)) {
 
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected == 0) {
-                throw new DbException("No product found with the given cart ID and product ID.");
+            selectAmountStmt.setInt(1, cartId);
+            selectAmountStmt.setInt(2, productId);
+            ResultSet rs = selectAmountStmt.executeQuery();
+
+            int amount = 0;
+            if (rs.next()) {
+                amount = rs.getInt("amount");
+            } else {
+                System.out.println("No product found in the cart for given cart ID and product ID.");
+                return;
             }
+            DB.closeResultSet(rs);
+
+            deleteStmt.setInt(1, cartId);
+            deleteStmt.setInt(2, productId);
+            int rowsAffected = deleteStmt.executeUpdate();
+            if (rowsAffected == 0) {
+                System.out.println("No product found with the given cart ID and product ID.");
+                return;
+            }
+
+            updateStockStmt.setInt(1, amount);
+            updateStockStmt.setInt(2, productId);
+            updateStockStmt.executeUpdate();
+
+            System.out.println("Product removed from cart successfully: Product ID " + productId);
+
         } catch (SQLException e) {
-            throw new DbException("Error deleting product from cart: " + e.getMessage());
+            throw new DbException("Error deleting product from cart and updating stock: " + e.getMessage());
         }
     }
 
