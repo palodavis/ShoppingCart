@@ -14,4 +14,9 @@ public class CartController {
         cartDao.insertCart(cart);
         System.out.println("Inserted! IdCart = " + cart.getIdCart());
     }
+
+    public Cart searchIdCart(int cartId) {
+        Cart cart = cartDao.searchCart(cartId);
+        return cart;
+    }
 }

@@ -30,20 +30,38 @@ public class ShoppingView {
         ShoppingCart shoppingCart = new ShoppingCart();
         shoppingCart.setCart(cart);
         boolean addMoreItems = true;
+
         while (addMoreItems) {
             System.out.print("Enter the product ID to add to the cart: ");
             int productIdToAdd = scanner.nextInt();
             scanner.nextLine();
             Product productToAdd = productController.searchId(productIdToAdd);
 
-            boolean productExistsInCart = shoppingCart.getItems().stream()
-                    .anyMatch(item -> item.getProduct().getIdProduct() == productIdToAdd);
-
             if (productToAdd != null) {
-                System.out.print("Enter the quantity to add: ");
-                int quantity = scanner.nextInt();
-                scanner.nextLine();
+                if (shoppingCart.getItems().stream().anyMatch(item -> item.getProduct().getIdProduct() == productIdToAdd)) {
+                    System.out.println("Product '" + productToAdd.getName() + "' is already in the cart.");
+                    continue;
+                }
+                if (productToAdd.getAmount() == 0) {
+                    System.out.println("Product '" + productToAdd.getName() + "' is out of stock. Please choose another product.");
+                    continue;
+                }
+                boolean validQuantity = false;
+                int quantity = 0;
+                while (!validQuantity) {
+                    System.out.println("Available stock: " + productToAdd.getAmount());
+                    System.out.print("Enter the quantity to add: ");
+                    quantity = scanner.nextInt();
+                    scanner.nextLine();
 
+                    if (quantity > productToAdd.getAmount()) {
+                        System.out.println("Quantity exceeds available stock. Please enter a quantity <= " + productToAdd.getAmount());
+                    } else if (quantity <= 0) {
+                        System.out.println("Invalid quantity. Please enter a value greater than 0.");
+                    } else {
+                        validQuantity = true;
+                    }
+                }
                 CartItem cartItem = new CartItem(productToAdd, quantity);
                 shoppingController.addProductToCart(shoppingCart, cartItem);
             }
@@ -55,6 +73,7 @@ public class ShoppingView {
                 addMoreItems = false;
             }
         }
+
         System.out.println("\nCart details:");
         for (CartItem cartItem : shoppingCart.getItems()) {
             System.out.println("Product: " + cartItem.getProduct().getName() + ", Quantity: " + cartItem.getAmount());
@@ -62,51 +81,77 @@ public class ShoppingView {
         System.out.println("Total value of the shopping cart: " + shoppingCart.getTotalValue());
     }
 
-    public void updateProductInCart() {
-        System.out.print("Enter the Cart ID: ");
-        int idCart = scanner.nextInt();
-        scanner.nextLine();
 
-        System.out.print("Enter the Product ID to update: ");
-        int productIdUpdate = scanner.nextInt();
-        scanner.nextLine();
+    public void updateProductInCart() {
+        Cart cart = getCartById();
+        if (cart == null) return;
+
+        Product productCartToUpdate = getProductById();
+
+        if (productCartToUpdate == null) {
+            System.out.println("Product not found in the cart!");
+            return;
+        }
 
         System.out.print("Enter the new quantity: ");
         int newQuantity = scanner.nextInt();
         scanner.nextLine();
 
-        Product productCartToUpdate = productController.searchId(productIdUpdate);
+        ShoppingCart shoppingCartToUpdate = new ShoppingCart();
+        shoppingCartToUpdate.getCart().setIdCart(cart.getIdCart());
 
-        if (productCartToUpdate != null) {
-            ShoppingCart shoppingCartToUpdate = new ShoppingCart();
-            shoppingCartToUpdate.getCart().setIdCart(idCart);
+        CartItem itemToUpdate = new CartItem(productCartToUpdate, newQuantity);
+        shoppingCartToUpdate.addItem(itemToUpdate);
 
-            CartItem itemToUpdate = new CartItem(productCartToUpdate, newQuantity);
-            shoppingCartToUpdate.addItem(itemToUpdate);
-
-            try {
-                shoppingController.updateProductToCart(shoppingCartToUpdate, productIdUpdate);
-            } catch (DbException e) {
-                System.out.println("Error: " + e.getMessage());
-            }
-        } else {
-            System.out.println("Product not found.");
+        try {
+            shoppingController.updateProductToCart(shoppingCartToUpdate, productCartToUpdate.getIdProduct());
+            shoppingController.searchIdProuctCard(cart.getIdCart());
+            shoppingController.totalValueCart(cart.getIdCart());
+        } catch (DbException e) {
+            System.out.println("Error: " + e.getMessage());
         }
     }
 
     public void removeProductFromCart() {
+        Cart cart = getCartById();
+        if (cart == null) return;
+
+        Product productToRemove = getProductById();
+
+        if (productToRemove == null) {
+            System.out.println("Product not found in the cart!");
+            return;
+        }
+
+        Product productIdDelete = productController.searchId(productToRemove.getIdProduct());
+
+        if (productIdDelete != null) {
+            ShoppingCart shoppingCartToRemove = new ShoppingCart();
+            shoppingCartToRemove.getCart().setIdCart(cart.getIdCart());
+            shoppingController.deleteProductFromCart(shoppingCartToRemove, productToRemove.getIdProduct());
+            System.out.println("Product removed from the cart successfully!");
+        } else {
+            System.out.println("Error: Product not found!");
+        }
+    }
+
+    private Product getProductById() {
+        System.out.print("Enter the Product ID: ");
+        int productId = scanner.nextInt();
+        scanner.nextLine();
+        Product product = productController.searchId(productId);
+        return product;
+    }
+
+    private Cart getCartById() {
         System.out.print("Enter the Cart ID: ");
-        int cartId = scanner.nextInt();
+        int idCart = scanner.nextInt();
         scanner.nextLine();
-
-        System.out.print("Enter the Product ID to remove: ");
-        int productIdToRemove = scanner.nextInt();
-        scanner.nextLine();
-
-        ShoppingCart shoppingCartToRemove = new ShoppingCart();
-        shoppingCartToRemove.getCart().setIdCart(cartId);
-
-        shoppingController.deleteProductFromCart(shoppingCartToRemove, productIdToRemove);
+        Cart cart = cartController.searchIdCart(idCart);
+        if (cart == null) {
+            System.out.println("Error: Cart not found for ID: " + idCart);
+        }
+        return cart;
     }
 
     public void viewCartDetails() {
